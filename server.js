@@ -1,10 +1,14 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const User = require('./models/User')
+const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const session = require('express-session')
+const MongoDBSession = require('connect-mongodb-session')(session)
 
 const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
 
@@ -13,9 +17,34 @@ mongoose.connect("mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/
     useUnifiedTopology: true
 })
 
+const store = new MongoDBSession({
+    uri:"mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/ARCMain?retryWrites=true&w=majority",
+    collection: 'sessions',
+})
+
 const app = express()
 app.use('/', express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.json())
+app.use(cookieParser())
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cors({
+    origin: ["http://localost:3000"],
+    methods:["GET", "POST"],
+    credentials:true
+}))
+
+// build the session and cookie
+app.use(session({
+    key: "userID",
+    secret: 'key that signs cookie',
+    resave: false,
+    saveUninitialized: false,
+    cookie:{
+        expires: 1000*60*60,
+    },
+    store: store,
+}))
 
 
 app.post('/api/change-password', async (req, res) => {
@@ -46,13 +75,23 @@ app.post('/api/login', async (req, res) => {
             }, 
             JWT_SECRET
         )
-
-        return res.json({status: 'ok', data: 'GOOD'})
+        //if success login, set auth to true
+        req.session.isAuth = true;
+        req.session.user = user;
+        return res.json({status: 'ok', error: 'GOOD'})
     }
 
-    res.json({status: 'error', data: 'Invalid username/password'})
+    res.json({status: 'error', error: 'Invalid username/password'})
 })
 
+app.get("/api/login",(req,res)=>{
+    if(req.session.user){
+        res.send({loggedIn: true, user:req.session.user})
+    }
+    else{
+        res.send({loggedIn: false})
+    }
+})
 
 
 app.post('/api/register', async (req, res) => {
@@ -87,8 +126,7 @@ app.post('/api/register', async (req, res) => {
     }
     
     // console.log(await bcrypt.hash(password, 12))
-	
-    
+
     res.json({ status: 'ok' })
 })
 
