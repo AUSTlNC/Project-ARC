@@ -1,6 +1,7 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const mongoose = require('mongoose')
 const User = require('../models/User')
+const password = require('secure-random-password')
 
 
 module.exports = function (passport) {
@@ -14,7 +15,7 @@ module.exports = function (passport) {
       async (accessToken, refreshToken, profile, done) => {
         const newUser = new User({
           username: profile.emails[0].value,
-          password: 'jkldjsvlknl4utioqq3'
+          password: password.randomString()
         })
         try {
           let user = await User.findOne({ username: profile.emails[0].value})
