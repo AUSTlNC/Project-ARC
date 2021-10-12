@@ -34,12 +34,6 @@ app.use('/auth', require('./routes/auth'))
 const PORT = process.env.PORT || 5000
 
 
-// app.get('/google', passport.authenticate('google', { scope: ['profile', 'email']}));
-// app.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login'}), (req, res) => {
-//     // res.redirect('/dashboard');
-//     res.end('Logged in!');
-// })
-
 app.listen(
     PORT,
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
