@@ -8,6 +8,9 @@ const jwt = require('jsonwebtoken')
 const postRouter = require('./routes/posting')
 var dotenv = require('dotenv')
 var passport = require('passport');
+const session = require('express-session')
+const cors = require('cors')
+
 
 dotenv.config({path: './config/config.env'})
 
@@ -33,6 +36,19 @@ const app = express()
 app.use('/', express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.json())
 app.use('/posts', postRouter)
+
+//Enable CORS
+app.use(cors());
+
+//Sessions
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    //cookie: {secire: true}
+    //store in db database
+}))
+
 
 //Passport middleware
 app.use(passport.initialize());
