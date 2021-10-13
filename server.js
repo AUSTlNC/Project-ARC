@@ -29,6 +29,9 @@ require('./config/passport')(passport)
 
 const app = express()
 
+// use cors before all route definitions
+app.use(cors());
+
 //Sessions
 app.use(session({
     secret: 'keyboard cat',
