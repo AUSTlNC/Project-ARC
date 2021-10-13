@@ -6,6 +6,10 @@ const User = require('./models/User')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const postRouter = require('./routes/posting')
+var dotenv = require('dotenv')
+var passport = require('passport');
+
+dotenv.config({path: './config/config.env'})
 
 const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
 
@@ -14,10 +18,29 @@ mongoose.connect("mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/
     useUnifiedTopology: true
 })
 
+
+//Load config
+dotenv.config({path: './config/config.env'})
+
+//Passport config
+require('./config/passport')(passport)
+
+
 const app = express()
+
+
+
 app.use('/', express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.json())
 app.use('/posts', postRouter)
+
+//Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+//Routes
+app.use('/auth', require('./routes/auth'))
+
 
 app.post('/api/change-password', async (req, res) => {
     const {token} = req.body
@@ -132,6 +155,10 @@ app.post('/api/register', async (req, res) => {
     res.json({ status: 'ok' })
 })
 
-app.listen(9999, () => {
-	console.log('Server up at 9999')
-})
+const PORT = process.env.PORT || 5000
+
+
+app.listen(
+    PORT,
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
+);
