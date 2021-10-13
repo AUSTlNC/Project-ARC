@@ -7,8 +7,9 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const postRouter = require('./routes/posting')
 var dotenv = require('dotenv')
-var passport = require('passport');
-
+var passport = require('passport')
+const session = require('express-session')
+const cors = require('cors')
 dotenv.config({path: './config/config.env'})
 
 const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
@@ -28,6 +29,14 @@ require('./config/passport')(passport)
 
 const app = express()
 
+//Sessions
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    //cookie: {secire: true}
+    //store in db database
+}))
 
 
 app.use('/', express.static(path.join(__dirname, 'static')))
@@ -155,7 +164,7 @@ app.post('/api/register', async (req, res) => {
     res.json({ status: 'ok' })
 })
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 9999
 
 
 app.listen(
