@@ -5,7 +5,6 @@ const mongoose = require('mongoose')
 const User = require('./models/User')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const flash = require('connect-flash')
 const postRouter = require('./routes/posting')
 
 const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
