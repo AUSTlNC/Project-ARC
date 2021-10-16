@@ -1,14 +1,16 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const User = require('./models/User')
-const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const postRouter = require('./routes/posting')
+var dotenv = require('dotenv')
+var passport = require('passport')
 const session = require('express-session')
-const MongoDBSession = require('connect-mongodb-session')(session)
+const cors = require('cors')
+dotenv.config({path: './config/config.env'})
 
 const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
 
@@ -17,34 +19,39 @@ mongoose.connect("mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/
     useUnifiedTopology: true
 })
 
-const store = new MongoDBSession({
-    uri:"mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/ARCMain?retryWrites=true&w=majority",
-    collection: 'sessions',
-})
+
+//Load config
+dotenv.config({path: './config/config.env'})
+
+//Passport config
+require('./config/passport')(passport)
+
 
 const app = express()
-app.use('/', express.static(path.join(__dirname, 'static')))
-app.use(bodyParser.json())
-app.use(cookieParser())
-app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(cors({
-    origin: ["http://localost:3000"],
-    methods:["GET", "POST"],
-    credentials:true
-}))
+// use cors before all route definitions
+app.use(cors());
 
-// build the session and cookie
+//Sessions
 app.use(session({
-    key: "userID",
-    secret: 'key that signs cookie',
+    secret: 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    cookie:{
-        expires: 1000*60*60,
-    },
-    store: store,
+    //cookie: {secire: true}
+    //store in db database
 }))
+
+
+app.use('/', express.static(path.join(__dirname, 'static')))
+app.use(bodyParser.json())
+app.use('/posts', postRouter)
+
+//Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+//Routes
+app.use('/auth', require('./routes/auth'))
 
 
 app.post('/api/change-password', async (req, res) => {
@@ -75,30 +82,19 @@ app.post('/api/login', async (req, res) => {
             }, 
             JWT_SECRET
         )
-        //if success login, set auth to true
-        req.session.isAuth = true;
-        req.session.user = user;
-        return res.json({status: 'ok', error: 'GOOD'})
+
+        return res.json({status: 'ok', data: 'GOOD'})
     }
 
-    res.json({status: 'error', error: 'Invalid username/password'})
+    return res.json({status: 'error', error: 'Invalid username/password'})
 })
-
-app.get("/api/login",(req,res)=>{
-    if(req.session.user){
-        res.send({loggedIn: true, user:req.session.user})
-    }
-    else{
-        res.send({loggedIn: false})
-    }
-})
-
 
 app.post('/api/register', async (req, res) => {
 	console.log(req.body)
     const {username,  password: plainTextPassword } = req.body
     
     if(!username || typeof username !== 'string') {
+        res.status()
         return res.json({status: 'error', error: 'Invalid username'})
     }
     if(!plainTextPassword || typeof plainTextPassword !== 'string') {
@@ -116,6 +112,7 @@ app.post('/api/register', async (req, res) => {
     try {
         const response = await User.create({username, password})
         console.log('User created successfully: ', response)
+
     } catch(error) {
         console.log(JSON.stringify(error))
         if (error.code === 11000) {
@@ -126,10 +123,13 @@ app.post('/api/register', async (req, res) => {
     }
     
     // console.log(await bcrypt.hash(password, 12))
-
-    res.json({ status: 'ok' })
+    return res.json({status: 'ok', data: 'GOOD'})
 })
 
-app.listen(9999, () => {
-	console.log('Server up at 9999')
-})
+const PORT = process.env.PORT || 9999
+
+
+app.listen(
+    PORT,
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
+);
