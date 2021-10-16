@@ -11,7 +11,8 @@ var dotenv = require('dotenv')
 var passport = require('passport')
 const session = require('express-session')
 const cors = require('cors')
-const MongoDBSession = require('connect-mongodb-session')(session)
+dotenv.config({path: './config/config.env'})
+
 const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
 const app = express()
 dotenv.config({path: './config/config.env'})
@@ -28,35 +29,23 @@ dotenv.config({path: './config/config.env'})
 require('./config/passport')(passport)
 
 
-const store = new MongoDBSession({
-    uri:"mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/ARCMain?retryWrites=true&w=majority",
-    collection: 'sessions',
-})
-// use cors before all route definitions
-app.use(cors({
-    origin: ["http://localost:3000"],
-    methods:["GET", "POST"],
-    credentials:true
-}))
+const app = express()
 
-// build the session and cookie
+// use cors before all route definitions
+app.use(cors());
+
+//Sessions
 app.use(session({
-    key: "userID",
-    secret: 'key that signs cookie',
+    secret: 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    cookie:{
-        //session valid for 1 hour
-        expires: 1000*60*60,
-    },
-    store: store,
+    //cookie: {secire: true}
+    //store in db database
 }))
 
 
 app.use('/', express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.json())
-app.use(cookieParser())
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/posts', postRouter)
 
 //Passport middleware
@@ -104,15 +93,6 @@ app.post('/api/login', async (req, res) => {
     return res.json({status: 'error', error: 'Invalid username/password'})
 })
 
-app.get("/api/login",(req,res)=>{
-    if(req.session.user){
-        res.send({loggedIn: true, user:req.session.user})
-    }
-    else{
-        res.send({loggedIn: false})
-    }
-})
-
 app.post('/api/register', async (req, res) => {
 	console.log(req.body)
     const {username,  password: plainTextPassword } = req.body
@@ -147,6 +127,8 @@ app.post('/api/register', async (req, res) => {
 })
 
 const PORT = process.env.PORT || 9999
+
+
 app.listen(
     PORT,
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
