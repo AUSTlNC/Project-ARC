@@ -86,47 +86,7 @@ app.post('/api/login', async (req, res) => {
         return res.json({status: 'ok', data: 'GOOD'})
     }
 
-    res.json({status: 'error', error: 'Invalid username/password'})
-})
-
-
-
-app.post('/api/register', async (req, res) => {
-	console.log(req.body)
-    const {username,  password: plainTextPassword } = req.body
-    
-    if(!username || typeof username !== 'string') {
-        res.status()
-        return res.json({status: 'error', error: 'Invalid username'})
-    }
-    if(!plainTextPassword || typeof plainTextPassword !== 'string') {
-        return res.json({status: 'error', error: 'Invalid password'})
-    }
-
-    if(plainTextPassword.length < 5) {
-        return res.json({
-            status: 'error', 
-            error: 'Password too short'
-        })
-    }
-
-    const password = await bcrypt.hash(plainTextPassword, 12)
-    try {
-        const response = await User.create({username, password})
-        console.log('User created successfully: ', response)
-    } catch(error) {
-        console.log(JSON.stringify(error))
-        if (error.code === 11000) {
-            // duplicate key
-            return res.json({status: 'error', error: 'Username already taken'})
-        }
-        throw error
-    }
-    
-    // console.log(await bcrypt.hash(password, 12))
-	
-    
-    res.json({ status: 'ok' })
+    return res.json({status: 'error', error: 'Invalid username/password'})
 })
 
 app.post('/api/register', async (req, res) => {
@@ -152,6 +112,7 @@ app.post('/api/register', async (req, res) => {
     try {
         const response = await User.create({username, password})
         console.log('User created successfully: ', response)
+
     } catch(error) {
         console.log(JSON.stringify(error))
         if (error.code === 11000) {
@@ -162,9 +123,7 @@ app.post('/api/register', async (req, res) => {
     }
     
     // console.log(await bcrypt.hash(password, 12))
-	
-    
-    res.json({ status: 'ok' })
+    return res.json({status: 'ok', data: 'GOOD'})
 })
 
 const PORT = process.env.PORT || 9999

@@ -9,7 +9,7 @@ router.get(
     '/google/callback', 
     passport.authenticate('google', { failureRedirect: '/',
     successRedirect: "http://localhost:3000"})
-    
+
 )
 
 module.exports = router
