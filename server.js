@@ -54,6 +54,8 @@ app.use(session({
 
 app.use('/', express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.json())
+app.use(cookieParser())
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/posts', postRouter)
 
 //Passport middleware
