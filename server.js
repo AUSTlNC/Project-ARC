@@ -114,7 +114,10 @@ app.get("/api/login",(req,res)=>{
 })
 
 app.get("/api/logout", (req, res)=>{
+    console.log(req.session);
     req.session.destroy();
+    res.clearCookie("key");
+    console.log(req.session);
     res.send({loggedIn: false})
 })
 
