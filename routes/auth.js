@@ -7,9 +7,12 @@ router.get('/google', passport.authenticate('google', {scope: ['openid', 'profil
 
 router.get(
     '/google/callback', 
-    passport.authenticate('google', { failureRedirect: '/',
-    successRedirect: "http://localhost:3000"})
-
+    passport.authenticate('google', { failureRedirect: "http://localhost:3000"}),
+    function(req, res){
+        req.session.isAuth = true,
+        req.session.user = req.user,
+        res.redirect( "http://localhost:3000")
+    }
 )
 
 module.exports = router
