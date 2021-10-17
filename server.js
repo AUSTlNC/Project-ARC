@@ -113,6 +113,11 @@ app.get("/api/login",(req,res)=>{
     }
 })
 
+app.get("/api/logout", (req, res)=>{
+    req.session.destroy();
+    res.send({loggedIn: false})
+})
+
 app.post('/api/register', async (req, res) => {
 	console.log(req.body)
     const {username,  password: plainTextPassword } = req.body
