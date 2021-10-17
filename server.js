@@ -1,26 +1,25 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const User = require('./models/User')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const postRouter = require('./routes/posting')
 var dotenv = require('dotenv')
-var passport = require('passport');
+var passport = require('passport')
 const session = require('express-session')
 const cors = require('cors')
-
-
-dotenv.config({path: './config/config.env'})
-
+const MongoDBSession = require('connect-mongodb-session')(session)
 const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
+const app = express()
+dotenv.config({path: './config/config.env'})
 
 mongoose.connect("mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/ARCMain?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-
 
 //Load config
 dotenv.config({path: './config/config.env'})
@@ -29,26 +28,36 @@ dotenv.config({path: './config/config.env'})
 require('./config/passport')(passport)
 
 
-const app = express()
+const store = new MongoDBSession({
+    uri:"mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/ARCMain?retryWrites=true&w=majority",
+    collection: 'sessions',
+})
+// use cors before all route definitions
+app.use(cors({
+    origin: ["http://localost:3000"],
+    methods:["GET", "POST"],
+    credentials:true
+}))
 
+// build the session and cookie
+app.use(session({
+    key: "userID",
+    secret: 'key that signs cookie',
+    resave: false,
+    saveUninitialized: false,
+    cookie:{
+        //session valid for 1 hour
+        expires: 1000*60*60,
+    },
+    store: store,
+}))
 
 
 app.use('/', express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.json())
+app.use(cookieParser())
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/posts', postRouter)
-
-//Enable CORS
-app.use(cors());
-
-//Sessions
-app.use(session({
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: false,
-    //cookie: {secire: true}
-    //store in db database
-}))
-
 
 //Passport middleware
 app.use(passport.initialize());
@@ -86,51 +95,22 @@ app.post('/api/login', async (req, res) => {
             }, 
             JWT_SECRET
         )
-
+        //if success login, set auth to true
+        req.session.isAuth = true;
+        req.session.user = user;
         return res.json({status: 'ok', data: 'GOOD'})
     }
 
-    res.json({status: 'error', error: 'Invalid username/password'})
+    return res.json({status: 'error', error: 'Invalid username/password'})
 })
 
-
-
-app.post('/api/register', async (req, res) => {
-	console.log(req.body)
-    const {username,  password: plainTextPassword } = req.body
-    
-    if(!username || typeof username !== 'string') {
-        res.status()
-        return res.json({status: 'error', error: 'Invalid username'})
+app.get("/api/login",(req,res)=>{
+    if(req.session.user){
+        res.send({loggedIn: true, user:req.session.user})
     }
-    if(!plainTextPassword || typeof plainTextPassword !== 'string') {
-        return res.json({status: 'error', error: 'Invalid password'})
+    else{
+        res.send({loggedIn: false})
     }
-
-    if(plainTextPassword.length < 5) {
-        return res.json({
-            status: 'error', 
-            error: 'Password too short'
-        })
-    }
-
-    const password = await bcrypt.hash(plainTextPassword, 12)
-    try {
-        const response = await User.create({username, password})
-        console.log('User created successfully: ', response)
-    } catch(error) {
-        console.log(JSON.stringify(error))
-        if (error.code === 11000) {
-            // duplicate key
-            return res.json({status: 'error', error: 'Username already taken'})
-        }
-        throw error
-    }
-    
-    // console.log(await bcrypt.hash(password, 12))
-	
-    
-    res.json({ status: 'ok' })
 })
 
 app.post('/api/register', async (req, res) => {
@@ -146,16 +126,14 @@ app.post('/api/register', async (req, res) => {
     }
 
     if(plainTextPassword.length < 5) {
-        return res.json({
-            status: 'error', 
-            error: 'Password too short'
-        })
+        return res.json({status: 'error', error: 'Password too short'})
     }
 
     const password = await bcrypt.hash(plainTextPassword, 12)
     try {
         const response = await User.create({username, password})
         console.log('User created successfully: ', response)
+
     } catch(error) {
         console.log(JSON.stringify(error))
         if (error.code === 11000) {
@@ -164,16 +142,11 @@ app.post('/api/register', async (req, res) => {
         }
         throw error
     }
-    
     // console.log(await bcrypt.hash(password, 12))
-	
-    
-    res.json({ status: 'ok' })
+    return res.json({status: 'ok', data: 'GOOD'})
 })
 
-const PORT = process.env.PORT || 5000
-
-
+const PORT = process.env.PORT || 9999
 app.listen(
     PORT,
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)

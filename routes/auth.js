@@ -4,12 +4,12 @@ const router = express.Router()
 
 router.get('/google', passport.authenticate('google', {scope: ['openid', 'profile', 'email']}))
 
+
 router.get(
     '/google/callback', 
-    passport.authenticate('google', { failureRedirect:'/'}), 
-    (req, res) => {    
-        res.redirect('/dashboard')
-    }
+    passport.authenticate('google', { failureRedirect: '/',
+    successRedirect: "http://localhost:3000"})
+
 )
 
 module.exports = router
