@@ -1,12 +1,24 @@
-
 const fs = require('fs');
 const AWS = require('aws-sdk');
 const s3CreatingBucket = require('./s3CreatingBucket.js');
 var s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
-s3CreatingBucket('arc-testing-bucket-2');
-
-const s3UploadFile = (fileName,bucketName,nameInS3) => {
+// const checkBucketExists = async bucket => {
+//   const s3 = new AWS.S3();
+//   const options = {
+//     Bucket: bucket,
+//   };
+//   try {
+//     await s3.headBucket(options).promise();
+//     return true;
+//   } catch (error) {
+//     if (error.statusCode === 404) {
+//       return false;
+//     }
+//     throw error;
+//   }
+// };
+const s3UploadingFile = (fileName,bucketName,nameInS3) => {
     // Read content from the file
     const fileContent = fs.readFileSync(fileName);
 
@@ -26,4 +38,5 @@ const s3UploadFile = (fileName,bucketName,nameInS3) => {
     });
 };
 
-s3UploadFile('./../config/aws.txt');
+module.exports = s3UploadingFile;
+s3UploadingFile('./../config/passport.js','arc-testing-bucket-2','test2.js');
