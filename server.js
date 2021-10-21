@@ -7,6 +7,7 @@ const User = require('./models/User')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const postRouter = require('./routes/posting')
+const commentRouter = require('./routes/commenting')
 var dotenv = require('dotenv')
 var passport = require('passport')
 const session = require('express-session')
@@ -58,6 +59,7 @@ app.use(bodyParser.json())
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/posts', postRouter)
+app.use('/comments', commentRouter)
 
 //Passport middleware
 app.use(passport.initialize());
@@ -66,6 +68,26 @@ app.use(passport.session());
 //Routes
 app.use('/auth', require('./routes/auth'))
 
+
+app.post('/api/commentTesting', async(req,res)=>{
+    const {userId,postId,comment} = req.body
+    if(comment.length<15) {
+        return res.json({status: 'error', error: 'Comment too short'})
+    }
+     try {
+        const response = await Comment.create({userId, postId,comment})
+        console.log('Comment posted successfully: ', response)
+
+    }
+    catch(error) {
+        console.log(JSON.stringify(error))
+
+        throw error
+    }
+    console.log(comment)
+    res.json({status: 'ok'})
+    }
+)
 
 app.post('/api/change-password', async (req, res) => {
     const {token} = req.body
