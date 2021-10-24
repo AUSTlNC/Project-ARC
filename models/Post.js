@@ -6,7 +6,6 @@ const PostSchema = new mongoose.Schema({
     userinfo: {type: mongoose.Schema.Types.ObjectId, required: true, ref: "UserSchema"},
     description:{type: String, required: true},
     artType:{type: String, required: true},
-    photoURL:{type: String, required: true},
     createdAt:{type: Date, default: Date.now},
     image:{type: Buffer, required: true},
     imageType:{type: String, required: true}
