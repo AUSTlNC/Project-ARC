@@ -11,19 +11,7 @@ router.get('/', async (req, res) => {
 } )
 
 router.post('/temp', async (req, res) => {
-    const TempImage = new tempImage({
-        image: null,
-        imageType: null,
-        imageID: req.body.imageID
-    })
-    saveImage(tempImage, req.body.files)
-    try {
-        const response = await tempImage.create(TempImage)
-        console.log('Post created successfully: ', response)
-    } catch(error) {
-        console.log(JSON.stringify(error))
-        throw error
-    }
+
 })
 
 
@@ -33,9 +21,11 @@ router.post('/', async (req, res) => {
         title: req.body.title, 
         description: req.body.description, 
         artType: req.body.artType,
-        photoURL: req.body.photoURL
+        photoURL: req.body.photoURL,
+        image: req.body.image,
+        imageType: req.body.imageType
     })
-    saveImage(post, req.body.files)
+    
     try {
         const response = await Post.create(post)
         console.log('Post created successfully: ', response)

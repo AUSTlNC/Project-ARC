@@ -55,9 +55,9 @@ app.use(session({
 
 
 app.use('/', express.static(path.join(__dirname, 'static')))
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: "100mb" }))
 app.use(cookieParser())
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 90000 }));
 app.use('/posts', postRouter)
 app.use('/comments', commentRouter)
 
