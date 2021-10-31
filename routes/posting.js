@@ -11,7 +11,13 @@ router.get('/', async (req, res) => {
 } )
 
 router.post('/temp', async (req, res) => {
-
+    try {
+        console.log('Post recieved: ', res)
+        return res.json({status: 'ok', data: 'GOOD'})
+    } catch(error) {
+        console.log(JSON.stringify(error))
+        throw error
+    }
 })
 
 
@@ -32,6 +38,16 @@ router.post('/', async (req, res) => {
         console.log(JSON.stringify(error))
         throw error
     }
+    // try {
+    //     const response = await User.updateOne(
+    //         { _id: req.body.userinfo },
+    //         { $set: { posts: [] } },
+    //         { upsert: true } // Make this update into an upsert
+    //     );
+    // } catch(error) {
+    //     console.log(JSON.stringify(error))
+    //     throw error
+    // }
 })
 
 
