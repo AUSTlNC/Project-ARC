@@ -6,8 +6,20 @@ const tempImage = require('./../models/tempImage')
 const validImageTypes = ['image/jpeg', 'image/png']
 
 // get all posts
-router.get('/', async (req, res) => {
-
+router.post('/all', async (req, res) => {
+    console.log("yes!!!")
+    let query = Post.find()
+    if (req.query.filter != null && req.query.filter != '') {
+        query = query.regex('filter', new RegExp(req.query.filter, 'i'))
+    }
+    try {
+        const posts = await query.exec()
+        console.log('Posts： ', posts)
+        return res.json(posts)
+    } catch(error) {
+        console.log(JSON.stringify(error))
+        throw error
+    }
 } )
 
 router.post('/temp', async (req, res) => {
@@ -27,12 +39,22 @@ router.post('/', async (req, res) => {
         title: req.body.title, 
         description: req.body.description, 
         artType: req.body.artType,
-        image: req.body.image,
+        image: new Buffer.from(req.body.image, "base64"),
         imageType: req.body.imageType
     })
-    
+    var userID = req.body.userinfo
     try {
-        const response = await Post.create(post)
+        let model = post
+        const response = model.save(function(err, saved){
+            if(err){console.log(err)}
+            var post_id = saved._id
+            console.log(post_id)
+            User.findOneAndUpdate(
+                {_id: userID},
+                {$push:{postID:post_id}}, (err, userObj)=>{
+                    console.log(userObj)
+                })
+        })
         console.log('Post created successfully: ', response)
     } catch(error) {
         console.log(JSON.stringify(error))
