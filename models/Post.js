@@ -7,7 +7,7 @@ const PostSchema = new mongoose.Schema({
     description:{type: String, required: true},
     artType:{type: String, required: true},
     createdAt:{type: Date, default: Date.now},
-    image:{type: Buffer, required: true},
+    image:{type: String, required: true},
     imageType:{type: String, required: true}
 }, {collection: "posts"})
 

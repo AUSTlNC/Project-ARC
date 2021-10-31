@@ -24,7 +24,6 @@ router.post('/all', async (req, res) => {
 
 router.post('/temp', async (req, res) => {
     try {
-        console.log('Post recieved: ', res)
         return res.json({status: 'ok', data: 'GOOD'})
     } catch(error) {
         console.log(JSON.stringify(error))
@@ -39,7 +38,7 @@ router.post('/', async (req, res) => {
         title: req.body.title, 
         description: req.body.description, 
         artType: req.body.artType,
-        image: new Buffer.from(req.body.image, "base64"),
+        image: req.body.image,
         imageType: req.body.imageType
     })
     var userID = req.body.userinfo
