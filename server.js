@@ -146,10 +146,14 @@ app.post('/api/register', async (req, res) => {
         console.log(JSON.stringify(error))
         if (error.code === 11000) {
             // duplicate key
+
             return res.json({status: 'error', error: 'Username already taken'})
         }
         throw error
     }
+    const user = await User.findOne({username}).lean()
+    req.session.isAuth = true;
+    req.session.user = user;
     // console.log(await bcrypt.hash(password, 12))
     return res.json({status: 'ok', data: 'GOOD'})
 })
