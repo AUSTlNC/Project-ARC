@@ -1,37 +1,39 @@
 const express = require('express')
 const router = express.Router()
 const Post = require('./../models/Post')
-const mongoose = require("mongoose")
-const User = require("./../models/User")
-const ObjectID = require('mongodb').ObjectID
+const User = require('./../models/User')
+const validImageTypes = ['image/jpeg', 'image/png']
 
-router.get('/')
+// get all posts
+router.get('/', async (req, res) => {
+
+} )
 
 router.post('/', async (req, res) => {
-    const { title, description, artType, userinfo} = req.body
-    var userID = userinfo._id
+    const post = new Post({
+        title: req.body.title, 
+        description: req.body.description, 
+        artType: req.body.artType,
+        photoURL: req.body.photoURL
+    })
+    saveImage(post, req.body.files)
     try {
-        let model = new Post({title, description, artType, userID})
-        model.save(function(err, saved){
-            if(err){console.log(err)}
-            var post_id = saved._id
-            console.log(post_id)
-
-            User.findOneAndUpdate(
-                {_id: userID},
-                {$push:{postID:post_id}}, (err, userObj)=>{
-                })
-
-        })
-
-
-        
-
+        const response = await Post.create(post)
+        console.log('Post created successfully: ', response)
     } catch(error) {
         console.log(JSON.stringify(error))
         throw error
     }
 })
 
+
+function saveImage(post, imageEncoded) {
+    if (imageEncoded == null) return
+    const img = JSON.parse(imageEncoded)
+    if (img != null && validImageTypes.includes(img.type)) {
+        post.image = new Buffer.from(img.data, 'base64')
+        post.imageType = img.type
+    }
+}
 
 module.exports = router
