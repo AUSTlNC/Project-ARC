@@ -3,6 +3,11 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
+mongoose.connect("mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/ARCMain?retryWrites=true&w=majority", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+
 const User = require('./models/User')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -17,10 +22,6 @@ const JWT_SECRET = 'asdfjaoiwer987q293rhajksdhfyasdfkh*&^*%'
 const app = express()
 dotenv.config({path: './config/config.env'})
 
-mongoose.connect("mongodb+srv://austin:caijh20000609@arc-main.ih4xb.mongodb.net/ARCMain?retryWrites=true&w=majority", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
 
 //Load config
 dotenv.config({path: './config/config.env'})
@@ -69,25 +70,6 @@ app.use(passport.session());
 app.use('/auth', require('./routes/auth'))
 
 
-app.post('/api/commentTesting', async(req,res)=>{
-    const {userId,postId,comment} = req.body
-    if(comment.length<15) {
-        return res.json({status: 'error', error: 'Comment too short'})
-    }
-     try {
-        const response = await Comment.create({userId, postId,comment})
-        console.log('Comment posted successfully: ', response)
-
-    }
-    catch(error) {
-        console.log(JSON.stringify(error))
-
-        throw error
-    }
-    console.log(comment)
-    res.json({status: 'ok'})
-    }
-)
 
 app.post('/api/change-password', async (req, res) => {
     const {token} = req.body
