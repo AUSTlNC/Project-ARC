@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express');
+const Mongoose = require('mongoose');
 const router = express.Router()
 const Comment = require('./../models/Comment')
 router.get('/')
@@ -33,13 +34,15 @@ router.post('/', async (req, res) => {
     console.log(comment)
     return res.json({status: 'ok'})
 })
-/*
-async function searchComment(req, res){
+
+router.get('/all', async(req, res) => {
     const {post_id} = req.body
-    var comments = Comment.find({postId: post_id})
-    return res.json(comments)
-}
-*/
+    var tempID = Mongoose.Types.ObjectId("618858ee552854fd553f0ba9");    
+    var comments
+    Comment.find({postId: tempID}, (err, finded)=>{return res.json(finded)})
+
+})
+
 
 
 module.exports = router
