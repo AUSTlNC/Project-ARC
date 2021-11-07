@@ -37,9 +37,9 @@ router.post('/', async (req, res) => {
 
 router.get('/all', async(req, res) => {
     const {post_id} = req.body
-    //var tempID = Mongoose.Types.ObjectId("618858ee552854fd553f0ba9");    
-    Comment.find({postId: post_id}, (err, finded)=>{return res.json(finded)})
-
+    var tempID = Mongoose.Types.ObjectId(post_id);    
+    Comment.find({postId: tempID}, (err, finded)=>{return res.json(finded)})
+    
 })
 
 
