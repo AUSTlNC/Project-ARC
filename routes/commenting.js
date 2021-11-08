@@ -42,6 +42,24 @@ router.get('/all', async(req, res) => {
     
 })
 
+//user comment search for commented
+router.get('/myComments', async (req, res) => {
+        console.log('request:', req.query.userId);
+        if (req.query.userId !== undefined) {
+            console.log('commented');
+            var response = {};
+            Comment.find({userinfo : req.query.userId}, function (err, data) {
+                if (err) {
+                    response = { "error": true, "user comment search": "Error fetching data" };
+                } else {
+                    response = { "error": false, "user comment search": data };
+                    console.log(response);
+                }
+                res.json(response);
+            });
+        }
+} )
+
 
 
 module.exports = router

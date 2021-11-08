@@ -3,7 +3,10 @@ const router = express.Router()
 const Post = require('./../models/Post')
 const User = require('./../models/User')
 const tempImage = require('./../models/tempImage')
+
 const validImageTypes = ['image/jpeg', 'image/png']
+
+
 
 // get all posts
 router.post('/all', async (req, res) => {
@@ -21,6 +24,81 @@ router.post('/all', async (req, res) => {
         throw error
     }
 } )
+//one keyword search
+//db.Post.createIndex( { title: "text", description: "text" } )
+router.get('/keyword', async (req, res) => {
+        console.log('request:', req.query.keyword);
+        if (req.query.keyword !== undefined) {
+            console.log('keyword');
+            var response = {};
+            Post.find({title : {$regex : req.query.keyword.toLowerCase()}}, function (err, data) {
+                if (err) {
+                    response = { "error": true, "keyword search": "Error fetching data" };
+                } else {
+                    response = { "error": false, "keyword search": data };
+                    console.log(response);
+                }
+                res.json(response);
+            });
+        }
+} )
+
+//more than one keyword search
+router.get('/keywords', async (req, res) => {
+        console.log('request:', req.query.keyword);
+        if (req.query.keyword !== undefined) {
+            console.log('keywords');
+            var response = {};
+            Post.find({$text : {$search: req.query.keyword.toLowerCase()}}, function (err, data) {
+                if (err) {
+                    response = { "error": true, "keywords search": "Error fetching data" };
+                } else {
+                    response = { "error": false, "keywords search": data };
+                    console.log(response);
+                }
+                res.json(response);
+            });
+        }
+} )
+
+//fuzzy search
+router.get('/fuzzy', async (req, res) => {
+        console.log('request:', req.query.keyword);
+        if (req.query.keyword !== undefined) {
+            console.log('fuzzy');
+            var response = {};
+            Post.fuzzySearch(req.query.keyword, function (err, data) {
+                if (err) {
+                    response = { "error": true, "fuzzy search": "Error fetching data" };
+                } else {
+                    response = { "error": false, "fuzzy search": data };
+                    console.log(response);
+                }
+                res.json(response);
+            });
+        }
+} )
+
+//userId search for my posts
+router.get('/myPosts', async (req, res) => {
+        console.log('request:', req.query.userId);
+        if (req.query.userId !== undefined) {
+            console.log('userId');
+            var response = {};
+            Post.find({userinfo : req.query.userId}, function (err, data) {
+                if (err) {
+                    response = { "error": true, "user posts search": "Error fetching data" };
+                } else {
+                    response = { "error": false, "user posts search": data };
+                    console.log(response);
+                }
+                res.json(response);
+            });
+        }
+} )
+
+
+
 
 router.post('/temp', async (req, res) => {
     try {

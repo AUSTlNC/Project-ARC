@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-
+const mongoose_fuzzy_searching = require('mongoose-fuzzy-searching');
 
 const PostSchema = new mongoose.Schema({
     title: {type: String, required: true},
@@ -11,5 +11,8 @@ const PostSchema = new mongoose.Schema({
     imageType:{type: String, required: true}
 }, {collection: "posts"})
 
+PostSchema.plugin(mongoose_fuzzy_searching, { fields: ['title', 'description'] });
+
 const PostModel = mongoose.model("PostSchema", PostSchema)
+
 module.exports = PostModel
