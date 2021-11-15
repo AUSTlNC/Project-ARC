@@ -62,12 +62,12 @@ router.get('/keywords', async (req, res) => {
 } )
 
 //fuzzy search
-router.get('/fuzzy', async (req, res) => {
-        console.log('request:', req.query.keyword);
-        if (req.query.keyword !== undefined) {
+router.post('/fuzzy', async (req, res) => {
+        console.log('request:', req.body);
+        if (req.body.keyword !== undefined) {
             console.log('fuzzy');
             var response = {};
-            Post.fuzzySearch(req.query.keyword, function (err, data) {
+            Post.fuzzySearch(req.body.keyword, function (err, data) {
                 if (err) {
                     response = { "error": true, "fuzzy search": "Error fetching data" };
                 } else {
