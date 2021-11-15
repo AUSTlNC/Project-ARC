@@ -97,7 +97,23 @@ router.get('/myPosts', async (req, res) => {
         }
 } )
 
-
+//userId search for my posts
+router.get('/type', async (req, res) => {
+    console.log('request:', req.query.type);
+    if (req.query.type !== undefined) {
+        console.log('userId');
+        var response = {};
+        Post.find({artType : req.query.type}, function (err, data) {
+            if (err) {
+                response = { "error": true, "type search": "Error fetching data" };
+            } else {
+                response = { "error": false, "type search": data };
+                console.log(response);
+            }
+            res.json(response);
+        });
+    }
+} )
 
 
 router.post('/temp', async (req, res) => {
