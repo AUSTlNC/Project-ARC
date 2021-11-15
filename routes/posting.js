@@ -97,7 +97,7 @@ router.get('/myPosts', async (req, res) => {
         }
 } )
 
-//userId search for my posts
+//type search for my posts
 router.get('/type', async (req, res) => {
     console.log('request:', req.query.type);
     if (req.query.type !== undefined) {
