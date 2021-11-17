@@ -3,8 +3,26 @@ const router = express.Router()
 const Post = require('./../models/Post')
 const User = require('./../models/User')
 const tempImage = require('./../models/tempImage')
-
 const validImageTypes = ['image/jpeg', 'image/png']
+
+//delete one
+router.get('/deleteOnePost', async (req, res) => {
+        console.log('delete request:', req.query.keyword);
+        if (req.query.keyword !== undefined) {
+            console.log('delete post');
+            var response = {};
+            Post.findOneAndDelete({_id : '61951f6eda231b9a44ad649e'}, function (err, data) {
+                if (err) {
+                    response = { "error": true, "delete post": "Error fetching data" };
+                } else {
+                    response = { "error": false, "delete post": data };
+                    console.log(response);
+                }
+                res.json(response);
+            });
+        }
+} )
+
 
 
 
@@ -24,6 +42,7 @@ router.post('/all', async (req, res) => {
         throw error
     }
 } )
+
 //one keyword search
 //db.Post.createIndex( { title: "text", description: "text" } )
 router.get('/keyword', async (req, res) => {
