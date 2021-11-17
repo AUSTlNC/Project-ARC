@@ -62,12 +62,14 @@ router.get('/keywords', async (req, res) => {
 } )
 
 //fuzzy search
-router.post('/fuzzy', async (req, res) => {
-        console.log('request:', req.body);
-        if (req.body.keyword !== undefined) {
+router.get('/fuzzy', async (req, res) => {
+        console.log('keyword:', req.query.keyword);
+        console.log('filter:', req.query.filter);
+        if (req.query.keyword !== undefined) {
             console.log('fuzzy');
             var response = {};
-            Post.fuzzySearch(req.body.keyword, function (err, data) {
+            if(req.query.filter==='all'){
+                Post.fuzzySearch(req.query.keyword, function (err, data) {
                 if (err) {
                     response = { "error": true, "fuzzy search": "Error fetching data" };
                 } else {
@@ -75,7 +77,32 @@ router.post('/fuzzy', async (req, res) => {
                     console.log(response);
                 }
                 res.json(response);
-            });
+                });
+            }
+            else if(req.query.filter==='artwork'){
+                Post.fuzzySearch(req.query.keyword, { artType: 'artwork' },function (err, data) {
+                if (err) {
+                    response = { "error": true, "fuzzy search": "Error fetching data" };
+                } else {
+                    response = { "error": false, "fuzzy search": data };
+                    console.log(response);
+                }
+                res.json(response);
+                });
+
+            }
+            else if(req.query.filter==='photography'){
+                Post.fuzzySearch(req.query.keyword, { artType: 'photography' },function (err, data) {
+                if (err) {
+                    response = { "error": true, "fuzzy search": "Error fetching data" };
+                } else {
+                    response = { "error": false, "fuzzy search": data };
+                    console.log(response);
+                }
+                res.json(response);
+                });
+
+            }
         }
 } )
 
@@ -116,14 +143,6 @@ router.get('/type', async (req, res) => {
 } )
 
 
-router.post('/temp', async (req, res) => {
-    try {
-        return res.json({status: 'ok', data: 'GOOD'})
-    } catch(error) {
-        console.log(JSON.stringify(error))
-        throw error
-    }
-})
 
 
 router.post('/', async (req, res) => {

@@ -1,6 +1,7 @@
 const express = require('express');
 const Mongoose = require('mongoose');
 const router = express.Router()
+const Post = require('./../models/Post')
 const Comment = require('./../models/Comment')
 router.get('/')
 
@@ -53,7 +54,16 @@ router.get('/myComments', async (req, res) => {
                     response = { "error": true, "user comment search": "Error fetching data" };
                 } else {
                     response = { "error": false, "user comment search": data };
-                    console.log(response);
+                        var postIds=data.map(d=>d.postId);
+                        var postResponse={};
+                        Post.find({postId: {$in: postIds}}, function (err, data) {
+                            if (err) {
+                                postResponse = { "error": true, "user commented posts": "Error fetching data" };
+                            } else {
+                                postResponse = { "error": false, "user commented posts": data };
+                                console.log(postResponse);
+                            }
+                        })
                 }
                 res.json(response);
             });

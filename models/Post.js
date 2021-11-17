@@ -11,7 +11,8 @@ const PostSchema = new mongoose.Schema({
     imageType:{type: String, required: true}
 }, {collection: "posts"})
 
-PostSchema.plugin(mongoose_fuzzy_searching, { fields: ['title', 'description'] });
+PostSchema.plugin(mongoose_fuzzy_searching, { fields: [{name:'title',weight: 5,escapeSpecialCharacters: true},
+        {name:'description',weight:2,escapeSpecialCharacters: true}] });
 
 const PostModel = mongoose.model("PostSchema", PostSchema)
 
