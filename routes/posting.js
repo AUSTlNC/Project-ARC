@@ -4,6 +4,7 @@ const Post = require('./../models/Post')
 const User = require('./../models/User')
 const Comment = require('./../models/Comment')
 const tempImage = require('./../models/tempImage')
+const Mongoose = require('mongoose')
 const validImageTypes = ['image/jpeg', 'image/png']
 
 //delete one
@@ -14,35 +15,29 @@ router.post('/deleteOnePost', async (req, res) => {
     if (pId !== undefined && uId !== undefined) {
         console.log('delete post');
         var response = {};
-        Post.findOneAndDelete({_id : postId}, function (err, data) {
+        Post.findOneAndDelete({_id : pId}, function (err, data) {
             if (err) {
                 response = { "error": true, "delete post": "Error fetching data" };
-            } else {
-                response = { "error": false, "delete post": data };
-                console.log(response);
-            }
+                return res.json(response)
+            } 
         });
         Comment.deleteMany({postId : pId}, function (err, data) {
             if (err) {
                 response = { "error": true, "delete post": "Error fetching data" };
-            } else {
-                response = { "error": false, "delete post": data };
-                console.log(response);
-            }
+                return res.json(response)
+            } 
         });
-        User.updateOne({_id : uId},{$pull: {postID: pId}}, function(err, data){
+        User.updateOne({_id : uId},{$pull: {postID: Mongoose.Types.ObjectId(pId)}}, function(err, data){
             if (err) {
                 response = { "error": true, "delete post": "Error fetching data" };
-            } else {
-                response = { "error": false, "delete post": data };
-                console.log(response);
-            }
+                return res.json(response)
+            } 
         });
-        
+        response = { "error": false};
+        return res.json(response)
+
     }
 } )
-
-
 
 
 // get all posts
