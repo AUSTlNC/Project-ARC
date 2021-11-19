@@ -47,21 +47,20 @@ router.post('/all', async(req, res) => {
 router.get('/myComments', async (req, res) => {
         console.log('request:', req.query.userId);
         if (req.query.userId !== undefined) {
-            console.log('commented');
             var response = {};
-            Comment.find({userinfo : req.query.userId}, function (err, data) {
+
+            Comment.find({userId : Mongoose.Types.ObjectId(req.query.userId)}, function (err, data) {
                 if (err) {
                     response = { "error": true, "user comment search": "Error fetching data" };
                 } else {
                     response = { "error": false, "user comment search": data };
                         var postIds=data.map(d=>d.postId);
                         var postResponse={};
-                        Post.find({postId: {$in: postIds}}, function (err, data) {
-                            if (err) {
+                        Post.find({_id: {$in: postIds}}, function (nerr, ndata) {
+                            if (nerr) {
                                 postResponse = { "error": true, "user commented posts": "Error fetching data" };
                             } else {
-                                postResponse = { "error": false, "user commented posts": data };
-                                console.log(postResponse);
+                                postResponse = { "error": false, "user commented posts": ndata };
                             }
                             res.json(postResponse);
                         })
