@@ -2,25 +2,44 @@ const express = require('express')
 const router = express.Router()
 const Post = require('./../models/Post')
 const User = require('./../models/User')
+const Comment = require('./../models/Comment')
 const tempImage = require('./../models/tempImage')
 const validImageTypes = ['image/jpeg', 'image/png']
 
 //delete one
-router.get('/deleteOnePost', async (req, res) => {
-        console.log('delete request:', req.query.keyword);
-        if (req.query.keyword !== undefined) {
-            console.log('delete post');
-            var response = {};
-            Post.findOneAndDelete({_id : '61951f6eda231b9a44ad649e'}, function (err, data) {
-                if (err) {
-                    response = { "error": true, "delete post": "Error fetching data" };
-                } else {
-                    response = { "error": false, "delete post": data };
-                    console.log(response);
-                }
-                res.json(response);
-            });
-        }
+router.post('/deleteOnePost', async (req, res) => {
+    console.log('delete request:', req.body.postId);
+    pId = req.body.postId;
+    uId = req.body.userId;
+    if (pId !== undefined && uId !== undefined) {
+        console.log('delete post');
+        var response = {};
+        Post.findOneAndDelete({_id : postId}, function (err, data) {
+            if (err) {
+                response = { "error": true, "delete post": "Error fetching data" };
+            } else {
+                response = { "error": false, "delete post": data };
+                console.log(response);
+            }
+        });
+        Comment.deleteMany({postId : pId}, function (err, data) {
+            if (err) {
+                response = { "error": true, "delete post": "Error fetching data" };
+            } else {
+                response = { "error": false, "delete post": data };
+                console.log(response);
+            }
+        });
+        User.updateOne({_id : uId},{$pull: {postID: pId}}, function(err, data){
+            if (err) {
+                response = { "error": true, "delete post": "Error fetching data" };
+            } else {
+                response = { "error": false, "delete post": data };
+                console.log(response);
+            }
+        });
+        
+    }
 } )
 
 
