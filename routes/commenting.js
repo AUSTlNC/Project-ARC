@@ -63,9 +63,9 @@ router.get('/myComments', async (req, res) => {
                                 postResponse = { "error": false, "user commented posts": data };
                                 console.log(postResponse);
                             }
+                            res.json(postResponse);
                         })
                 }
-                res.json(response);
             });
         }
 } )
