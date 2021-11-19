@@ -49,7 +49,7 @@ router.get('/myComments', async (req, res) => {
         if (req.query.userId !== undefined) {
             var response = {};
 
-            Comment.find({userId : Mongoose.Types.ObjectId(req.query.userId)}, function (err, data) {
+            Comment.find({userId : req.query.userId}, function (err, data) {
                 if (err) {
                     response = { "error": true, "user comment search": "Error fetching data" };
                 } else {
