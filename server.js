@@ -138,7 +138,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     if(plainTextPassword.length < 5) {
-        return res.json({status: 'error', error: 'Password too short'})
+        return res.json({status: 'error', error: 'Password too short. Must be more than 5 characters.'})
     }
 
     const password = await bcrypt.hash(plainTextPassword, 12)

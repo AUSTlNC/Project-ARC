@@ -15,14 +15,14 @@ const spamfilter = require('spam-filter')('naiveBayes')
 router.post('/', async (req, res) => {
     const { userId, postId, comment} = req.body
     if(swearfilter.isProfane(comment)) {
-        return res.json({status: 'error', error: 'Profanity detected'})
+        return res.json({status: 'error', error: 'Profanity detected. Consider changing your wording.'})
     }
     if(spamfilter.isSpam(comment)){
-        return res.json({status: 'error', error: 'Spam detected'})
+        return res.json({status: 'error', error: 'Spam detected. Consider changing your wording.'})
     }
 
     if(comment.length < 10){
-        return res.json({status: 'error', error: 'Response too short'})
+        return res.json({status: 'error', error: 'Response too short. Must be more than 10 characters.'})
     }
 
     try {
