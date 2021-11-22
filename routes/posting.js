@@ -57,6 +57,14 @@ router.post('/all', async (req, res) => {
     }
 } )
 
+router.post('/temp', async (req, res) => {
+    try {
+        return res.json({status: 'ok', data: 'GOOD'})
+    } catch(error) {
+        console.log(JSON.stringify(error))
+        throw error
+    }
+})
 //one keyword search
 //db.Post.createIndex( { title: "text", description: "text" } )
 router.get('/keyword', async (req, res) => {
