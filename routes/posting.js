@@ -101,7 +101,7 @@ router.get('/fuzzy', async (req, res) => {
         if (req.query.keyword !== undefined) {
             console.log('fuzzy');
             var response = {};
-            if(req.query.filter==='all'){
+            if(req.query.filter==='all' || !req.query.filter){
                 Post.fuzzySearch(req.query.keyword, function (err, data) {
                 if (err) {
                     response = { "error": true, "fuzzy search": "Error fetching data" };
