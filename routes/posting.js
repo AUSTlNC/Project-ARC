@@ -65,42 +65,6 @@ router.post('/temp', async (req, res) => {
         throw error
     }
 })
-//one keyword search
-//db.Post.createIndex( { title: "text", description: "text" } )
-router.get('/keyword', async (req, res) => {
-        console.log('request:', req.query.keyword);
-        if (req.query.keyword !== undefined) {
-            console.log('keyword');
-            var response = {};
-            Post.find({title : {$regex : req.query.keyword.toLowerCase()}}, function (err, data) {
-                if (err) {
-                    response = { "error": true, "keyword search": "Error fetching data" };
-                } else {
-                    response = { "error": false, "keyword search": data };
-                    console.log(response);
-                }
-                res.json(response);
-            });
-        }
-} )
-
-//more than one keyword search
-router.get('/keywords', async (req, res) => {
-        console.log('request:', req.query.keyword);
-        if (req.query.keyword !== undefined) {
-            console.log('keywords');
-            var response = {};
-            Post.find({$text : {$search: req.query.keyword.toLowerCase()}}, function (err, data) {
-                if (err) {
-                    response = { "error": true, "keywords search": "Error fetching data" };
-                } else {
-                    response = { "error": false, "keywords search": data };
-                    console.log(response);
-                }
-                res.json(response);
-            });
-        }
-} )
 
 //fuzzy search
 router.get('/fuzzy', async (req, res) => {
@@ -110,7 +74,7 @@ router.get('/fuzzy', async (req, res) => {
             console.log('fuzzy');
             var response = {};
             if(req.query.filter==='all' || !req.query.filter){
-                Post.fuzzySearch(req.query.keyword, function (err, data) {
+                Post.search(req.query.keyword, function (err, data) {
                 if (err) {
                     response = { "error": true, "fuzzy search": "Error fetching data" };
                 } else {
@@ -119,30 +83,6 @@ router.get('/fuzzy', async (req, res) => {
                 }
                 res.json(response);
                 });
-            }
-            else if(req.query.filter==='artwork'){
-                Post.fuzzySearch(req.query.keyword, { artType: 'artwork' },function (err, data) {
-                if (err) {
-                    response = { "error": true, "fuzzy search": "Error fetching data" };
-                } else {
-                    response = { "error": false, "fuzzy search": data };
-                    console.log(response);
-                }
-                res.json(response);
-                });
-
-            }
-            else if(req.query.filter==='photography'){
-                Post.fuzzySearch(req.query.keyword, { artType: 'photography' },function (err, data) {
-                if (err) {
-                    response = { "error": true, "fuzzy search": "Error fetching data" };
-                } else {
-                    response = { "error": false, "fuzzy search": data };
-                    console.log(response);
-                }
-                res.json(response);
-                });
-
             }
         }
 } )
