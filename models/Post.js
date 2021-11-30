@@ -26,7 +26,7 @@ PostSchema.statics = {
     },
 
     searchFull: function (q,filter,callback) {
-        
+
         return this.find({
             $text: {$search: q, $caseSensitive: false },artType: filter
         },callback)
