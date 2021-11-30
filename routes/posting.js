@@ -15,29 +15,29 @@ router.post('/deleteOnePost', async (req, res) => {
     if (pId !== undefined && uId !== undefined) {
         console.log('delete post');
         var response = {};
-        Post.findOneAndDelete({_id : pId}, function (err, data) {
+        Post.findOneAndDelete({_id: pId}, function (err, data) {
             if (err) {
-                response = { "error": true, "delete post": "Error fetching data" };
+                response = {"error": true, "delete post": "Error fetching data"};
                 return res.json(response)
-            } 
+            }
         });
-        Comment.deleteMany({postId : pId}, function (err, data) {
+        Comment.deleteMany({postId: pId}, function (err, data) {
             if (err) {
-                response = { "error": true, "delete post": "Error fetching data" };
+                response = {"error": true, "delete post": "Error fetching data"};
                 return res.json(response)
-            } 
+            }
         });
-        User.updateOne({_id : uId},{$pull: {postID: Mongoose.Types.ObjectId(pId)}}, function(err, data){
+        User.updateOne({_id: uId}, {$pull: {postID: Mongoose.Types.ObjectId(pId)}}, function (err, data) {
             if (err) {
-                response = { "error": true, "delete post": "Error fetching data" };
+                response = {"error": true, "delete post": "Error fetching data"};
                 return res.json(response)
-            } 
+            }
         });
-        response = { "error": false};
+        response = {"error": false};
         return res.json(response)
 
     }
-} )
+})
 
 
 // get all posts
@@ -51,16 +51,16 @@ router.post('/all', async (req, res) => {
         const posts = await query.exec()
         console.log('Posts： ', posts)
         return res.json(posts)
-    } catch(error) {
+    } catch (error) {
         console.log(JSON.stringify(error))
         throw error
     }
-} )
+})
 
 router.post('/temp', async (req, res) => {
     try {
         return res.json({status: 'ok', data: 'GOOD'})
-    } catch(error) {
+    } catch (error) {
         console.log(JSON.stringify(error))
         throw error
     }
@@ -68,42 +68,53 @@ router.post('/temp', async (req, res) => {
 
 //fuzzy search
 router.get('/fuzzy', async (req, res) => {
-        console.log('keyword:', req.query.keyword);
-        console.log('filter:', req.query.filter);
-        if (req.query.keyword !== undefined) {
-            console.log('fuzzy');
-            var response = {};
-            if(req.query.filter==='all' || !req.query.filter){
-                Post.search(req.query.keyword, function (err, data) {
-                if (err) {
-                    response = { "error": true, "fuzzy search": "Error fetching data" };
-                } else {
-                    response = { "error": false, "fuzzy search": data };
-                    console.log(response);
-                }
-                res.json(response);
-                });
+    console.log('keyword:', req.query.keyword);
+    console.log('filter:', req.query.filter);
+    if (req.query.keyword !== undefined) {
+        let photography = {};
+        let artwork = {};
+
+        Post.search(req.query.keyword, 'photography', function (err, data) {
+            if (err) {
+                photography = {"error": true, "photography search": "Error fetching data"};
+            } else {
+                photography = {"error": false, "photography search": data};
+                console.log(photography);
             }
-        }
-} )
+
+        });
+
+        Post.search(req.query.keyword, 'artwork', function (err, data) {
+            if (err) {
+                artwork = {"error": true, "artwork search": "Error fetching data"};
+            } else {
+                artwork = {"error": false, "artwork search": data};
+                console.log(artwork);
+            }
+
+        });
+        var response = {'artwork': artwork, 'photography': photography}
+        res.json(response);
+    }
+})
 
 //userId search for my posts
 router.get('/myPosts', async (req, res) => {
-        console.log('request:', req.query.userId);
-        if (req.query.userId !== undefined) {
-            console.log('userId');
-            var response = {};
-            Post.find({userinfo : req.query.userId}, function (err, data) {
-                if (err) {
-                    response = { "error": true, "user posts search": "Error fetching data" };
-                } else {
-                    response = { "error": false, "user posts search": data };
-                    console.log(response);
-                }
-                res.json(response);
-            });
-        }
-} )
+    console.log('request:', req.query.userId);
+    if (req.query.userId !== undefined) {
+        console.log('userId');
+        var response = {};
+        Post.find({userinfo: req.query.userId}, function (err, data) {
+            if (err) {
+                response = {"error": true, "user posts search": "Error fetching data"};
+            } else {
+                response = {"error": false, "user posts search": data};
+                console.log(response);
+            }
+            res.json(response);
+        });
+    }
+})
 
 //type search for my posts
 router.get('/type', async (req, res) => {
@@ -111,26 +122,24 @@ router.get('/type', async (req, res) => {
     if (req.query.type !== undefined) {
         console.log('userId');
         var response = {};
-        Post.find({artType : req.query.type}, function (err, data) {
+        Post.find({artType: req.query.type}, function (err, data) {
             if (err) {
-                response = { "error": true, "type search": "Error fetching data" };
+                response = {"error": true, "type search": "Error fetching data"};
             } else {
-                response = { "error": false, "type search": data };
+                response = {"error": false, "type search": data};
                 console.log(response);
             }
             res.json(response);
         });
     }
-} )
-
-
+})
 
 
 router.post('/', async (req, res) => {
     const post = new Post({
         userinfo: req.body.userinfo,
-        title: req.body.title, 
-        description: req.body.description, 
+        title: req.body.title,
+        description: req.body.description,
         artType: req.body.artType,
         image: req.body.image,
         imageType: req.body.imageType
@@ -138,18 +147,20 @@ router.post('/', async (req, res) => {
     var userID = req.body.userinfo
     try {
         let model = post
-        const response = model.save(function(err, saved){
-            if(err){console.log(err)}
+        const response = model.save(function (err, saved) {
+            if (err) {
+                console.log(err)
+            }
             var post_id = saved._id
             console.log(post_id)
             User.findOneAndUpdate(
                 {_id: userID},
-                {$push:{postID:post_id}}, (err, userObj)=>{
+                {$push: {postID: post_id}}, (err, userObj) => {
                     console.log(userObj)
                 })
         })
         console.log('Post created successfully: ', response)
-    } catch(error) {
+    } catch (error) {
         console.log(JSON.stringify(error))
         throw error
     }
