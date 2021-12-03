@@ -13,9 +13,8 @@ const PostSchema = new mongoose.Schema({
 
 
 PostSchema.statics = {
-
     searchPartial: function(q, filter, callback) {
-
+        console.log("partial filter",filter)
         return this.find({
             artType: filter,
             $or: [
@@ -26,7 +25,7 @@ PostSchema.statics = {
     },
 
     searchFull: function (q,filter,callback) {
-
+        console.log("full filter",filter)
         return this.find({
             $text: {$search: q, $caseSensitive: false },artType: filter
         },callback)

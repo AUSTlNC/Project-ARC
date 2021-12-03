@@ -71,30 +71,29 @@ router.get('/fuzzy', async (req, res) => {
     console.log('keyword:', req.query.keyword);
     console.log('filter:', req.query.filter);
     if (req.query.keyword !== undefined) {
-        let photography = {};
-        let artwork = {};
+        let response = {};
+        if (req.query.filter === 'photography') {
+            Post.search(req.query.keyword, 'photography', function (err, data) {
+                if (err) {
+                    response = {"error": true, "fuzzy search": "Error fetching data"};
+                } else {
+                    response = {"error": false, "fuzzy search": data};
+                    console.log(response);
+                }
+                res.json(response);
 
-        Post.search(req.query.keyword, 'photography', function (err, data) {
-            if (err) {
-                photography = {"error": true, "photography search": "Error fetching data"};
-            } else {
-                photography = {"error": false, "photography search": data};
-                console.log(photography);
-            }
-
-        });
-
-        Post.search(req.query.keyword, 'artwork', function (err, data) {
-            if (err) {
-                artwork = {"error": true, "artwork search": "Error fetching data"};
-            } else {
-                artwork = {"error": false, "artwork search": data};
-                console.log(artwork);
-            }
-
-        });
-        var response = {'artwork': artwork, 'photography': photography}
-        res.json(response);
+            });
+        } else if (req.query.filter === 'artwork') {
+            Post.search(req.query.keyword, 'artwork', function (err, data) {
+                if (err) {
+                    response = {"error": true, "fuzzy search": "Error fetching data"};
+                } else {
+                    response = {"error": false, "fuzzy search": data};
+                    console.log(response);
+                }
+                res.json(response);
+            });
+        }
     }
 })
 
